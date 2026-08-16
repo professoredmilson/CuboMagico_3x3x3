@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cubo Mágico 3x3 na Educação Básica | Guia Pedagógico</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+  :root{
+    --bg: #F1EEE6;
+    --panel: #FFFFFF;
+    --ink: #1A1B1F;
+    --ink-soft: #55575F;
+    --line: #DAD5C6;
+    --cube-red: #C8102E;
+    --cube-orange: #FF6B00;
+    --cube-yellow: #FFC300;
+    --cube-green: #009E60;
+    --cube-blue: #0051BA;
+    --cube-white: #FFFFFF;
+  }
+
+  html{ scroll-behavior: smooth; }
+
+  body{
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Source Sans 3', sans-serif;
+  }
+
+  h1, h2, h3, .display-font{
+    font-family: 'Space Grotesk', sans-serif;
+    letter-spacing: -0.01em;
+  }
+
+  .eyebrow{
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-size: 0.78rem;
+    color: var(--cube-blue);
+  }
+
+  /* --- faixa de facetas (elemento estrutural recorrente) --- */
+  .facet-strip{
+    display: flex;
+    height: 6px;
+    width: 100%;
+  }
+  .facet-strip span{ flex: 1 1 0; }
+  .facet-strip .f1{ background: var(--cube-red); }
+  .facet-strip .f2{ background: var(--cube-orange); }
+  .facet-strip .f3{ background: var(--cube-yellow); }
+  .facet-strip .f4{ background: var(--cube-green); }
+  .facet-strip .f5{ background: var(--cube-blue); }
+  .facet-strip .f6{ background: var(--cube-white); border-top: 1px solid var(--line); }
+
+  /* --- navbar --- */
+  .navbar-custom{
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);
+  }
+  .navbar-custom .navbar-brand{
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .navbar-custom .nav-link{
+    font-weight: 600;
+    color: var(--ink-soft);
+    font-size: 0.92rem;
+  }
+  .navbar-custom .nav-link:hover{ color: var(--cube-blue); }
+
+  /* --- hero --- */
+  .hero{ padding: 4.5rem 0 3.5rem; }
+  .hero h1{
+    font-size: clamp(2.2rem, 4.2vw, 3.4rem);
+    font-weight: 700;
+    line-height: 1.08;
+  }
+  .hero .lede{
+    font-size: 1.15rem;
+    color: var(--ink-soft);
+    max-width: 46ch;
+  }
+  .btn-cube-primary{
+    background: var(--cube-blue);
+    border-color: var(--cube-blue);
+    color: #fff;
+    font-weight: 600;
+    padding: 0.65rem 1.4rem;
+    border-radius: 8px;
+  }
+  .btn-cube-primary:hover{ background: #003d8a; border-color: #003d8a; color:#fff; }
+  .btn-cube-outline{
+    border: 2px solid var(--ink);
+    color: var(--ink);
+    font-weight: 600;
+    padding: 0.6rem 1.3rem;
+    border-radius: 8px;
+    background: transparent;
+  }
+  .btn-cube-outline:hover{ background: var(--ink); color: var(--bg); }
+
+  /* --- cubo 3D (3x3) --- */
+  .scene{
+    perspective: 1300px;
+    width: 240px;
+    height: 240px;
+    margin: 0 auto;
+  }
+  .cube-tilt{
+    width: 100%; height: 100%;
+    transform-style: preserve-3d;
+    transform: rotateX(-24deg);
+  }
+  .cube-spin{
+    width: 100%; height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    animation: spin 22s linear infinite;
+  }
+  @keyframes spin{
+    from{ transform: rotateY(0deg); }
+    to{ transform: rotateY(360deg); }
+  }
+  .face{
+    position: absolute;
+    width: 240px; height: 240px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
+    gap: 4px;
+    padding: 6px;
+    box-sizing: border-box;
+    background: #17181c;
+    border-radius: 18px;
+  }
+  .face span{ border-radius: 5px; }
+  .face-front{ transform: translateZ(120px); }
+  .face-back{ transform: rotateY(180deg) translateZ(120px); }
+  .face-right{ transform: rotateY(90deg) translateZ(120px); }
+  .face-left{ transform: rotateY(-90deg) translateZ(120px); }
+  .face-top{ transform: rotateX(90deg) translateZ(120px); }
+  .face-bottom{ transform: rotateX(-90deg) translateZ(120px); }
+
+  .c-red span{ background: var(--cube-red); }
+  .c-orange span{ background: var(--cube-orange); }
+  .c-yellow span{ background: var(--cube-yellow); }
+  .c-green span{ background: var(--cube-green); }
+  .c-blue span{ background: var(--cube-blue); }
+  .c-white span{ background: var(--cube-white); border: 1px solid #d9d9d9; }
+
+  @media (prefers-reduced-motion: reduce){
+    .cube-spin{ animation: none; }
+  }
+
+  /* --- seções gerais --- */
+  section{ padding: 4rem 0; }
+  .section-title{
+    font-size: clamp(1.7rem, 2.6vw, 2.3rem);
+    font-weight: 700;
+    margin-bottom: 0.6rem;
+  }
+  .section-lede{
+    color: var(--ink-soft);
+    max-width: 62ch;
+  }
+
+  .panel{
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+  }
+
+  /* --- cards de benefícios --- */
+  .benefit-card{
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 1.6rem;
+    height: 100%;
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .benefit-card:hover{
+    transform: translateY(-3px);
+    box-shadow: 0 10px 24px rgba(26,27,31,0.08);
+  }
+  .benefit-icon{
+    width: 42px; height: 42px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 0.9rem;
+    font-size: 1.05rem;
+  }
+  .benefit-card h3{
+    font-size: 1.08rem;
+    font-weight: 700;
+    margin-bottom: 0.4rem;
+  }
+  .benefit-card p{
+    font-size: 0.94rem;
+    color: var(--ink-soft);
+    margin-bottom: 0;
+  }
+
+  /* --- linha do tempo / passos --- */
+  .step{
+    display: flex;
+    gap: 1rem;
+    padding: 1.1rem 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .step:last-child{ border-bottom: none; }
+  .step .num{
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    color: var(--cube-blue);
+    font-size: 1.1rem;
+    min-width: 2.2rem;
+  }
+  .step h3{ font-size: 1.02rem; font-weight: 700; margin-bottom: 0.2rem; }
+  .step p{ color: var(--ink-soft); margin-bottom: 0; font-size: 0.95rem; }
+
+  /* --- casos reais --- */
+  .case-card{
+    border-left: 4px solid var(--cube-blue);
+    background: var(--panel);
+    border-radius: 0 12px 12px 0;
+    padding: 1.4rem 1.6rem;
+  }
+  .case-card + .case-card{ margin-top: 1rem; }
+  .case-card .loc{
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 0.82rem;
+    color: var(--cube-blue);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  /* --- callout --- */
+  .callout{
+    background: #FFF7DE;
+    border: 1px solid #F0D98A;
+    border-radius: 14px;
+    padding: 1.5rem 1.7rem;
+  }
+
+  .callout-quiet{
+    background: #EFF4FB;
+    border: 1px solid #C8D9EF;
+    border-radius: 14px;
+    padding: 1.5rem 1.7rem;
+  }
+
+  /* --- estatística em destaque --- */
+  .stat{
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 2.1rem;
+    color: var(--cube-blue);
+    line-height: 1;
+  }
+  .stat-label{
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+  }
+
+  /* --- fontes --- */
+  .source-item{
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 1rem 1.2rem;
+    display: block;
+    text-decoration: none;
+    color: var(--ink);
+  }
+  .source-item:hover{ border-color: var(--cube-blue); }
+  .source-item .tag{
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--cube-blue);
+  }
+  .source-item .url{
+    font-size: 0.82rem;
+    color: var(--ink-soft);
+    word-break: break-all;
+  }
+
+  footer{
+    background: var(--ink);
+    color: #CFCFD4;
+    padding: 2.5rem 0;
+  }
+  footer a{ color: #fff; }
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-custom sticky-top py-3">
+  <div class="container">
+    <a class="navbar-brand" href="#top">Cubo 3x3 <span style="color:var(--cube-blue)">na Escola</span></a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav ms-auto gap-lg-3">
+        <li class="nav-item"><a class="nav-link" href="#por-que">Por que o 3x3</a></li>
+        <li class="nav-item"><a class="nav-link" href="#beneficios">Benefícios</a></li>
+        <li class="nav-item"><a class="nav-link" href="#evidencias">Evidências</a></li>
+        <li class="nav-item"><a class="nav-link" href="#aplicacao">Em sala de aula</a></li>
+        <li class="nav-item"><a class="nav-link" href="#fontes">Fontes</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+<div class="facet-strip"><span class="f1"></span><span class="f2"></span><span class="f3"></span><span class="f4"></span><span class="f5"></span><span class="f6"></span></div>
+
+<!-- HERO -->
+<header id="top" class="hero">
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6">
+        <p class="eyebrow mb-3">Guia pedagógico · Educação básica</p>
+        <h1 class="mb-4">Nove peças por face. Um universo de possibilidades matemáticas.</h1>
+        <p class="lede mb-4">
+          O cubo mágico 3x3, o clássico criado por Ernő Rubik em 1974, é o modelo padrão usado em
+          competições, projetos de extensão universitária e currículos escolares no Brasil. Sua
+          complexidade extra — centros fixos, arestas, algoritmos encadeados — é justamente o que o
+          torna um laboratório completo de álgebra, geometria, combinatória e pensamento estratégico.
+        </p>
+        <div class="d-flex gap-3 flex-wrap">
+          <a href="#beneficios" class="btn-cube-primary">Ver os benefícios</a>
+          <a href="#fontes" class="btn-cube-outline">Ver as fontes</a>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="scene" aria-hidden="true">
+          <div class="cube-tilt">
+            <div class="cube-spin">
+              <div class="face face-front c-blue">
+                <span></span><span></span><span></span>
+                <span></span><span></span><span></span>
+                <span></span><span></span><span></span>
+              </div>
+              <div class="face face-back c-green">
+                <span></span><span></span><span></span>
+                <span></span><span></span><span></span>
+                <span></span><span></span><span></span>
+              </div>
+              <div class="face face-right c-red">
+                <span></span><span></span><span></span>
+                <span></span><span></span><span></span>
+                <span></span><span></span><span></span>
+              </div>
+              <div class="face face-left c-orange">
+                <span></span><span></span><span></span>
+                <span></span><span></span><span></span>
+                <span></span><span></span><span></span>
+              </div>
+              <div class="face face-top c-white">
+                <span></span><span></span><span></span>
+                <span></span><span></span><span></span>
+                <span></span><span></span><span></span>
+              </div>
+              <div class="face face-bottom c-yellow">
+                <span></span><span></span><span></span>
+                <span></span><span></span><span></span>
+                <span></span><span></span><span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- POR QUE O 3X3 -->
+<section id="por-que">
+  <div class="container">
+    <div class="row g-5 align-items-start">
+      <div class="col-lg-5">
+        <p class="eyebrow mb-2">O tabuleiro completo</p>
+        <h2 class="section-title">Por que o 3x3 é o cubo "de verdade" para a sala de aula</h2>
+        <p class="section-lede">
+          Diferente do 2x2, o 3x3 tem centros fixos (que funcionam como bússola de cores), peças de
+          aresta e de canto, e exige a combinação de vários algoritmos em sequência. É essa estrutura
+          mais rica que abre espaço para conectar o quebra-cabeça a conteúdos formais do currículo,
+          da álgebra à análise combinatória.
+        </p>
+      </div>
+      <div class="col-lg-7">
+        <div class="row g-4">
+          <div class="col-sm-6">
+            <div class="panel p-4 h-100">
+              <div class="stat">43&nbsp;trilhões¹</div>
+              <p class="stat-label mb-2">de combinações possíveis no cubo 3x3</p>
+              <p class="small text-body-secondary mb-0">
+                Esse número absurdo (na casa dos quintilhões) vira, em sala de aula, uma porta de
+                entrada natural para análise combinatória, probabilidade e teoria de grupos.
+              </p>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="panel p-4 h-100">
+              <h3 class="h6 fw-bold">Alinhado à BNCC</h3>
+              <p class="small text-body-secondary mb-0">
+                Pesquisas em Educação Matemática relacionam diretamente o uso do cubo mágico às
+                competências de matemática dos anos iniciais previstas na Base Nacional Comum
+                Curricular.
+              </p>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="panel p-4 h-100">
+              <h3 class="h6 fw-bold">Método de camadas</h3>
+              <p class="small text-body-secondary mb-0">
+                O método resolutivo por camadas ensina o aluno a quebrar um problema grande em etapas
+                menores e sequenciais — uma habilidade transferível para qualquer disciplina.
+              </p>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="panel p-4 h-100">
+              <h3 class="h6 fw-bold">Ponte para competições reais</h3>
+              <p class="small text-body-secondary mb-0">
+                É o formato oficial usado em campeonatos de speedcubing no Brasil e no mundo, o que dá
+                ao aluno um caminho concreto de evolução para além da sala de aula.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="small text-body-secondary mt-3 mb-0">¹ Aproximadamente 43 quintilhões de combinações — o número exato costuma ser apresentado de forma arredondada em sala de aula para fins didáticos.</p>
+  </div>
+</section>
+
+<div class="facet-strip"><span class="f5"></span><span class="f1"></span><span class="f3"></span><span class="f6"></span><span class="f4"></span><span class="f2"></span></div>
+
+<!-- BENEFÍCIOS -->
+<section id="beneficios" class="bg-white">
+  <div class="container">
+    <p class="eyebrow mb-2">O que a criança desenvolve</p>
+    <h2 class="section-title">Dez competências trabalhadas em um único brinquedo</h2>
+    <p class="section-lede mb-5">
+      Artigos acadêmicos, dissertações de mestrado profissional e projetos de extensão brasileiros
+      convergem para um mesmo conjunto de ganhos cognitivos, matemáticos e socioemocionais associados
+      à prática regular do cubo 3x3.
+    </p>
+
+    <div class="row g-4">
+      <div class="col-md-6 col-lg-4">
+        <div class="benefit-card">
+          <div class="benefit-icon" style="background:var(--cube-blue)">Ág</div>
+          <h3>Pensamento algébrico</h3>
+          <p>A resolução pode ser analisada por meio de grupos e permutações, dando um exemplo concreto e manipulável de conceitos que, mais tarde, aparecem em álgebra abstrata.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="benefit-card">
+          <div class="benefit-icon" style="background:var(--cube-red)">Cb</div>
+          <h3>Análise combinatória</h3>
+          <p>Contar as formas de resolver uma etapa do cubo é uma aula prática de arranjo e combinação, temas centrais do ensino médio de matemática.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="benefit-card">
+          <div class="benefit-icon" style="background:var(--cube-green)">Ge</div>
+          <h3>Geometria espacial</h3>
+          <p>Manipular e visualizar as três dimensões do cubo desenvolve a compreensão de simetria, rotação e transformações geométricas.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="benefit-card">
+          <div class="benefit-icon" style="background:var(--cube-orange)">Fc</div>
+          <h3>Concentração e foco</h3>
+          <p>Executar algoritmos de várias etapas sem perder a sequência exige atenção sustentada — treino valioso para qualquer atividade escolar.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="benefit-card">
+          <div class="benefit-icon" style="background:#7C4DFF">Pr</div>
+          <h3>Persistência e paciência</h3>
+          <p>O aprendizado dos algoritmos é gradual e cheio de tentativa e erro, ensinando que resultados vêm de prática constante, não de sorte.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="benefit-card">
+          <div class="benefit-icon" style="background:var(--cube-yellow); color:#3a2c00">Au</div>
+          <h3>Autoestima e protagonismo</h3>
+          <p>Projetos escolares relatam alunos com baixo desempenho em matemática se destacando na resolução do cubo, o que fortalece a confiança acadêmica.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="benefit-card">
+          <div class="benefit-icon" style="background:#00897B">Ev</div>
+          <h3>Combate à evasão escolar</h3>
+          <p>Escolas que adotaram o cubo como atividade eletiva relatam impacto positivo na permanência dos estudantes, ao tornar o ambiente escolar mais atrativo.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="benefit-card">
+          <div class="benefit-icon" style="background:#455A64">Eq</div>
+          <h3>Cooperação e ensino entre pares</h3>
+          <p>Alunos que aprendem primeiro tornam-se monitores dos colegas, reforçando o próprio conhecimento ao ensinar e fortalecendo laços na turma.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="benefit-card">
+          <div class="benefit-icon" style="background:#D81B60">In</div>
+          <h3>Interdisciplinaridade</h3>
+          <p>Além da matemática, o cubo é usado em projetos que cruzam física (mecanismos e movimento), artes (padrões e cor) e valores sociais, como partilha e cooperação.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EVIDÊNCIAS / FUNDAMENTAÇÃO -->
+<section id="evidencias">
+  <div class="container">
+    <p class="eyebrow mb-2">Base teórica e prática</p>
+    <h2 class="section-title mb-4">Currículo, teoria e escolas reais</h2>
+
+    <div class="row g-4 mb-5">
+      <div class="col-lg-6">
+        <div class="callout-quiet h-100">
+          <h3 class="h5 fw-bold mb-2">Da BNCC à Psicologia da Aprendizagem</h3>
+          <p class="mb-0 text-body-secondary">
+            Dissertações de mestrado profissional em Matemática articulam o uso do cubo mágico com as
+            competências de matemática dos anos iniciais previstas na Base Nacional Comum Curricular,
+            associando o brinquedo a teorias da Psicologia da Aprendizagem e ao desenvolvimento da
+            localização espacial já na educação infantil.
+          </p>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="callout h-100">
+          <h3 class="h5 fw-bold mb-2">Um caso de aula: análise combinatória</h3>
+          <p class="mb-0 text-body-secondary">
+            Professores relatam usar a segunda camada do cubo para introduzir arranjo e a última
+            camada para introduzir combinação — mostrando alunos lendo instruções, testando
+            algoritmos, ajudando colegas, frustrando-se e comemorando, tudo dentro do mesmo exercício
+            de pensamento crítico.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="h5 fw-bold mb-3">Experiências reais em escolas e universidades brasileiras</h3>
+    <div>
+      <div class="case-card">
+        <div class="loc">Escola da Serra (ES) · Ensino Fundamental e Médio</div>
+        <p class="mb-0 mt-1">
+          Nascido como eletiva no ensino médio em 2022, o projeto foi expandido para o fundamental em
+          2023 depois do sucesso inicial. A professora de matemática associa os movimentos do cubo a
+          conceitos do cotidiano e já leva estudantes para participar de campeonatos oficiais,
+          fortalecendo o protagonismo estudantil. A escola também relaciona o projeto ao combate à
+          evasão escolar.
+        </p>
+      </div>
+      <div class="case-card">
+        <div class="loc">Rede Municipal de Criciúma (SC) · 6º ao 9º ano</div>
+        <p class="mb-0 mt-1">
+          Um projeto da coordenação de matemática distribuiu 30 cubos mágicos 3x3 para cada uma de 22
+          escolas municipais, com apostilas, vídeos tutoriais em sete etapas e uma apresentação
+          coletiva final — mostrando como o cubo pode escalar para uma rede inteira de ensino.
+        </p>
+      </div>
+      <div class="case-card">
+        <div class="loc">Universidade Federal do Espírito Santo (campus Alegre)</div>
+        <p class="mb-0 mt-1">
+          Um projeto de extensão universitária ensina a resolução do cubo 3x3 a estudantes de
+          licenciatura em matemática, que depois levam a proposta para turmas do ensino fundamental e
+          médio, unindo formação docente e prática pedagógica direta.
+        </p>
+      </div>
+    </div>
+
+    <div class="callout mt-4">
+      <h3 class="h6 fw-bold mb-2">Um cuidado honesto: mais complexo exige mais preparo</h3>
+      <p class="mb-0 text-body-secondary">
+        Por ter mais peças e algoritmos do que o 2x2, o cubo 3x3 pede um professor mais preparado para
+        conduzir a aprendizagem passo a passo — o que reforça a importância de formação docente
+        específica e de materiais de apoio (apostilas, vídeos) antes de levar o projeto para a turma
+        toda.
+      </p>
+    </div>
+  </div>
+</section>
+
+<div class="facet-strip"><span class="f2"></span><span class="f4"></span><span class="f5"></span><span class="f1"></span><span class="f6"></span><span class="f3"></span></div>
+
+<!-- APLICAÇÃO EM SALA -->
+<section id="aplicacao" class="bg-white">
+  <div class="container">
+    <div class="row g-5">
+      <div class="col-lg-5">
+        <p class="eyebrow mb-2">Colocando em prática</p>
+        <h2 class="section-title">Como introduzir o cubo 3x3 na turma</h2>
+        <p class="section-lede">
+          Um roteiro em cinco passos, inspirado em projetos escolares e de extensão universitária
+          brasileiros, para transformar o cubo em rotina pedagógica de verdade.
+        </p>
+      </div>
+      <div class="col-lg-7">
+        <div class="panel p-4 p-md-5">
+          <div class="step">
+            <div class="num">01</div>
+            <div>
+              <h3>Comece pela primeira camada</h3>
+              <p>Ensine a montar a cruz e os cantos da camada inferior antes de qualquer algoritmo mais longo — é a base de todo o método por camadas.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="num">02</div>
+            <div>
+              <h3>Use a segunda camada para falar de arranjo</h3>
+              <p>Ao posicionar as arestas do meio, explore com a turma quantas formas diferentes existem de organizar as peças — uma ponte direta para arranjo.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="num">03</div>
+            <div>
+              <h3>Use a última camada para falar de combinação</h3>
+              <p>Os casos finais de orientação e permutação são uma oportunidade natural para introduzir combinação e análise de padrões.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="num">04</div>
+            <div>
+              <h3>Distribua apoio didático</h3>
+              <p>Apostilas, vídeos tutoriais em etapas e cubos suficientes para grupos pequenos fazem toda a diferença na adesão da turma.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="num">05</div>
+            <div>
+              <h3>Culmine em apresentação ou campeonato</h3>
+              <p>Uma mostra coletiva ou competição oficial dá um objetivo final ao projeto e valoriza publicamente o esforço de cada estudante.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FONTES -->
+<section id="fontes">
+  <div class="container">
+    <p class="eyebrow mb-2">Transparência</p>
+    <h2 class="section-title mb-2">Fontes consultadas</h2>
+    <p class="section-lede mb-4">
+      Esta página foi construída a partir de artigos acadêmicos, dissertações, projetos de extensão e
+      reportagens sobre o uso educacional do cubo mágico 3x3. Vale a pena ler as fontes na íntegra.
+    </p>
+    <div class="row g-3">
+      <div class="col-md-6">
+        <a class="source-item" href="https://ojs.brazilianjournals.com.br/ojs/index.php/BRJD/article/download/27579/21818/70767" target="_blank" rel="noopener">
+          <div class="tag">Artigo acadêmico · Brazilian Journal of Development</div>
+          <div class="fw-semibold my-1">Cubo Mágico: um recurso didático-pedagógico para a sala de aula</div>
+          <div class="url">ojs.brazilianjournals.com.br</div>
+        </a>
+      </div>
+      <div class="col-md-6">
+        <a class="source-item" href="https://sedu.es.gov.br/Not%C3%ADcia/escola-da-serra-usa-cubo-magico-em-aula-de-matematica" target="_blank" rel="noopener">
+          <div class="tag">Reportagem · SEDU-ES</div>
+          <div class="fw-semibold my-1">Escola da Serra usa "cubo mágico" em aula de matemática</div>
+          <div class="url">sedu.es.gov.br</div>
+        </a>
+      </div>
+      <div class="col-md-6">
+        <a class="source-item" href="https://www.slideshare.net/slideshow/o-cubo-mgico-de-rubik-no-ensino-de-matemtica/266126983" target="_blank" rel="noopener">
+          <div class="tag">Material acadêmico · SlideShare</div>
+          <div class="fw-semibold my-1">O cubo mágico de Rubik no ensino de Matemática</div>
+          <div class="url">slideshare.net</div>
+        </a>
+      </div>
+      <div class="col-md-6">
+        <a class="source-item" href="https://graduacao.alegre.ufes.br/conteudo/projeto-aprendendo-montar-cubo-magico" target="_blank" rel="noopener">
+          <div class="tag">Projeto de extensão · UFES</div>
+          <div class="fw-semibold my-1">Aprendendo a montar cubo mágico e suas aplicações no ensino de matemática</div>
+          <div class="url">graduacao.alegre.ufes.br</div>
+        </a>
+      </div>
+      <div class="col-md-6">
+        <a class="source-item" href="https://www.blog.oncube.com.br/maneiras-de-usar-o-cubo-magico-em-sala-de-aula/" target="_blank" rel="noopener">
+          <div class="tag">Blog especializado · ONCUBE</div>
+          <div class="fw-semibold my-1">Maneiras de usar o cubo mágico em sala de aula</div>
+          <div class="url">blog.oncube.com.br</div>
+        </a>
+      </div>
+      <div class="col-md-6">
+        <a class="source-item" href="https://www.researchgate.net/publication/325063890_Ensino_de_analise_combinatoria_usando_o_Cubo_Magico" target="_blank" rel="noopener">
+          <div class="tag">Artigo acadêmico · ResearchGate</div>
+          <div class="fw-semibold my-1">Ensino de análise combinatória usando o Cubo Mágico</div>
+          <div class="url">researchgate.net</div>
+        </a>
+      </div>
+      <div class="col-md-6">
+        <a class="source-item" href="https://matematicacriciuma.blogspot.com/2015/05/projeto-cubo-magico.html" target="_blank" rel="noopener">
+          <div class="tag">Projeto municipal · Coordenação de Matemática de Criciúma</div>
+          <div class="fw-semibold my-1">Projeto Cubo Mágico na rede municipal</div>
+          <div class="url">matematicacriciuma.blogspot.com</div>
+        </a>
+      </div>
+      <div class="col-md-6">
+        <a class="source-item" href="https://www.simpleteacher.com.br/blog/cubo-magico-algoritmos-basicos" target="_blank" rel="noopener">
+          <div class="tag">Material didático · Simple Teacher</div>
+          <div class="fw-semibold my-1">Cubo Mágico: algoritmos básicos para professores</div>
+          <div class="url">simpleteacher.com.br</div>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-8">
+        <p class="mb-1 fw-bold text-white">Cubo 3x3 na Escola</p>
+        <p class="small mb-0">
+          Conteúdo produzido com apoio de IA a partir de fontes públicas listadas acima. Recomenda-se
+          consultar as fontes originais e a coordenação pedagógica local antes de implementar o projeto.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
