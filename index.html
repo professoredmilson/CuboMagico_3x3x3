@@ -29,30 +29,14 @@
       align-items: center;
       justify-content: center;
       padding: 0.3rem;
-      gap: 0.5rem;
-    }
-    
-    .cabecalho {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-shrink: 0;
-    }
-    
-    .cabecalho img {
-      width: 32vmin;
-      max-width: 180px;
-      height: auto;
-      border-radius: 50%;
-      background: #fff;
-      padding: 4px;
+      gap: 0.6rem;
     }
     
     .cube-area {
-      width: 78vmin;
-      height: 78vmin;
-      max-width: 78vh;
-      max-height: 78vh;
+      width: 98vmin;
+      height: 98vmin;
+      max-width: 98vh;
+      max-height: 98vh;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -78,8 +62,8 @@
     }
     
     .btn-acao {
-      padding: 0.55rem 1.2rem;
-      font-size: 0.9rem;
+      padding: 0.6rem 1.3rem;
+      font-size: 0.95rem;
       font-weight: 600;
       border-radius: 50px;
       border: none;
@@ -100,8 +84,8 @@
     }
     
     .btn-creditos {
-      padding: 0.4rem 0.9rem;
-      font-size: 0.8rem;
+      padding: 0.45rem 1rem;
+      font-size: 0.85rem;
       background: #30363d;
       border: 1px solid #484f58;
       color: #c9d1d9;
@@ -240,11 +224,6 @@
 <body>
   <div class="app">
     
-    <!-- Cabeçalho com a imagem (≈ 1/3 do cubo) -->
-    <div class="cabecalho">
-      <img src="logo.png" alt="GET Olimpíadas Rio 2016">
-    </div>
-    
     <div class="cube-area">
       <div id="animcube"></div>
     </div>
@@ -307,6 +286,7 @@
     document.addEventListener("DOMContentLoaded", function() {
       iniciarCubo();
       
+      // Botão Fechar dos Créditos
       const btnCreditos = document.getElementById("btnFecharCreditos");
       btnCreditos.addEventListener("click", fecharCreditos);
       btnCreditos.addEventListener("touchend", function(e) {
@@ -314,6 +294,7 @@
         fecharCreditos();
       });
       
+      // Botão Continuar da Celebração
       const btnCeleb = document.getElementById("btnFecharCelebracao");
       btnCeleb.addEventListener("click", fecharCelebracao);
       btnCeleb.addEventListener("touchend", function(e) {
@@ -321,6 +302,7 @@
         fecharCelebracao();
       });
       
+      // Fecha créditos ao tocar fora
       document.getElementById("modalCreditos").addEventListener("click", function(e) {
         if (e.target === this) {
           fecharCreditos();
